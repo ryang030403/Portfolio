@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shipping LLM features like a backend engineer | Ryan George</title>
+  <meta name="description" content="Timeouts, caching, evals, and fallbacks: treat the model like any other unreliable dependency.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="container">
+      <a class="brand" href="../index.html">ryan<span>.</span>george</a>
+      <ul>
+        <li><a href="../index.html#projects">Projects</a></li>
+        <li><a href="../index.html#blog">Blog</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <article class="post">
+    <a class="back" href="../index.html#blog">← All posts</a>
+    <h1>Shipping LLM features like a backend engineer</h1>
+    <div class="meta">Ryan Joshua George · August 2026 · 7 min read</div>
+
+    <p>
+      Most writing about large language models focuses on prompts. Prompts matter, but in my experience the
+      difference between a demo and a feature people rely on is everything around the prompt. If you've built
+      distributed systems, you already have the right instincts. An LLM is a slow, expensive, non-deterministic
+      remote service. Treat it like one.
+    </p>
+
+    <h2>1. Timeouts, retries, and a fallback path</h2>
+    <p>
+      In my microservices project, the checkout saga has a compensating transaction for when payment fails. LLM
+      calls deserve the same thinking. Decide up front what the user sees when the model is slow, rate-limited,
+      or returns garbage.
+    </p>
+    <pre><code>async function summarize(text) {
+  try {
+    const out = await withTimeout(llm.complete(buildPrompt(text)), 8000);
+    return validate(out) ?? fallbackSummary(text);
+  } catch (err) {
+    log.warn("llm_failed", { err: err.message });
+    return fallbackSummary(text); // e.g. first N sentences
+  }
+}</code></pre>
+    <p>A degraded answer beats a spinner that never ends.</p>
+
+    <h2>2. Validate the output like untrusted input</h2>
+    <p>
+      If you ask for JSON, parse it and validate it against a schema before anything downstream touches it. If you
+      ask for a category, check it is one of the allowed values. Model output is user input with extra steps, and it
+      should go through the same checks before reaching your database or your UI.
+    </p>
+
+    <h2>3. Cache aggressively</h2>
+    <p>
+      Many LLM requests are repeats: the same document summarised, the same question asked about the same record.
+      A Redis cache keyed on a hash of the model name, prompt template version, and input can remove a large share
+      of calls, cutting both latency and cost. Include the template version in the key so a prompt change doesn't
+      serve stale answers.
+    </p>
+
+    <h2>4. Stream when a human is waiting</h2>
+    <p>
+      Time to first token matters more to perceived speed than total time. Building a WebSocket chat app taught me
+      how much a live, incremental update changes how a product feels. Streaming tokens to the client gives you
+      the same effect for free.
+    </p>
+
+    <h2>5. Evals are your test suite</h2>
+    <p>
+      You wouldn't merge a backend change without tests. Don't change a prompt or a model without running evals.
+      Start small:
+    </p>
+    <ul>
+      <li>Collect 30 to 50 real inputs with known-good outputs.</li>
+      <li>Write cheap automated checks first: schema valid, required fields present, length within bounds.</li>
+      <li>Add model-graded or human-graded checks for quality only where the cheap ones can't reach.</li>
+      <li>Run the suite in CI on every prompt change, and track the score over time.</li>
+    </ul>
+    <p>
+      This is the same "load-test it and publish the numbers" habit I apply to my side projects, pointed at a
+      different kind of system.
+    </p>
+
+    <h2>6. Observe everything</h2>
+    <p>
+      Log the prompt version, model, latency, token counts, and whether the output passed validation, for every
+      call. When quality drops (and it will, because inputs drift), those logs are how you find out why.
+    </p>
+
+    <h2>The takeaway</h2>
+    <blockquote>
+      The model is the most interesting part of an AI feature, but rarely the part that decides whether it works
+      in production.
+    </blockquote>
+    <p>
+      Good engineering fundamentals carry straight over: timeouts, validation, caching, tests, and observability.
+      If you already know how to build reliable services, you're closer to shipping good AI features than you
+      might think.
+    </p>
+  </article>
+
+  <footer><div class="container">© 2026 Ryan Joshua George</div></footer>
+</body>
+</html>
