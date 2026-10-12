@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>I measured my resume screener on real data. It scored 55%. | Ryan George</title>
+  <meta name="description" content="What happens when a TF-IDF model meets 8,000 human-labelled resumes, and why I'm glad I checked.">
+  <meta property="og:title" content="I measured my resume screener on real data. It scored 55%.">
+  <meta property="og:description" content="What happens when a TF-IDF model meets 8,000 human-labelled resumes, and why I'm glad I checked.">
+  <meta property="og:image" content="https://ryang030403.github.io/Portfolio/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="container">
+      <a class="brand" href="../index.html">ryan<span>.</span>george</a>
+      <ul>
+        <li><a href="../index.html#projects">Projects</a></li>
+        <li><a href="../index.html#blog">Blog</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <article class="post">
+    <a class="back" href="../index.html#blog">← All posts</a>
+    <h1>I measured my resume screener on real data. It scored 55%.</h1>
+    <div class="meta">Ryan Joshua George · October 2026 · 6 min read</div>
+
+    <p>
+      I built a resume-screening engine on TF-IDF and cosine similarity. On my handful of sample resumes it looked
+      great: the right candidates floated to the top, the tests passed, and it ranked a batch in milliseconds. Then I
+      ran it against real, human-labelled data, and it scored <strong>55%</strong>.
+    </p>
+    <p>This post is about that number, and why finding it was the most useful thing I did on the project.</p>
+
+    <h2>The setup</h2>
+    <p>
+      I used a public dataset of about 8,000 resume and job-description pairs, each labelled by a person as
+      <em>Good Fit</em>, <em>Potential Fit</em> or <em>No Fit</em>. I treated "shortlist" as Good or Potential Fit.
+      To keep the evaluation honest:
+    </p>
+    <ul>
+      <li>Resumes are ranked per job description, the same way the tool is used for real.</li>
+      <li>The shortlisting threshold is tuned on the training split only.</li>
+      <li>Accuracy is reported once, on a held-out test split of 1,759 pairs across 71 job descriptions the threshold never saw.</li>
+    </ul>
+
+    <pre><code>Held-out shortlisting accuracy : 55.0%
+Majority-class baseline        : 48.7%
+Precision / recall             : 56.5% / 52.9%
+ROC AUC (ranking quality)      : 0.590  (0.5 = random)</code></pre>
+
+    <p>
+      So TF-IDF beats always guessing the most common label, but only by about six points. As a ranker, it's
+      better than chance and not much more.
+    </p>
+
+    <h2>Why it struggles</h2>
+    <p>
+      TF-IDF rewards word overlap, so it works when the signal is lexical: the posting says "Redis" and the resume
+      says "Redis". But a human deciding fit is looking at things word overlap can't see:
+    </p>
+    <ul>
+      <li><strong>Seniority and depth.</strong> "Used Kubernetes once" and "ran our Kubernetes platform for three years" share the same keyword.</li>
+      <li><strong>Context.</strong> "Migrated the team off Java" and "five years of Java" look alike as a bag of words.</li>
+      <li><strong>Synonyms.</strong> "Postgres" and "PostgreSQL", or "k8s" and "Kubernetes", are different tokens.</li>
+      <li><strong>Long documents.</strong> Real resumes are long and noisy, which dilutes the cosine similarity. My sample resumes were short and clean, which is exactly why they flattered the model.</li>
+    </ul>
+
+    <h2>What the small test set hid</h2>
+    <p>
+      My original sample data was four short resumes I could reason about by hand. A model can look perfect on data
+      like that, because the data was written with the answer in mind. Speed fooled me the same way: ranking four
+      tiny resumes took a few milliseconds, but ranking a batch of 25 real ones takes around 100ms. Neither number
+      was wrong. They just weren't measuring the thing I cared about.
+    </p>
+    <blockquote>
+      A test suite tells you the code does what you meant. An evaluation on real labelled data tells you whether
+      what you meant was any good. You need both.
+    </blockquote>
+
+    <h2>What TF-IDF is still good for</h2>
+    <p>
+      I'd still keep it around as a fast first pass. It's explainable: for every candidate I can show which required
+      keywords matched and which were missing, which matters when the output affects someone's job application.
+      But on this evidence it shouldn't be the only thing making the call.
+    </p>
+
+    <h2>What's next</h2>
+    <p>
+      The useful part of this project now is the evaluation harness, not the model. Since the 55% is measured
+      reproducibly, I can swap in sentence embeddings or a trained classifier and see straight away whether they
+      actually help, instead of guessing. The evaluation script and full results are in the
+      <a href="https://github.com/ryang030403/Resume_Screening_AI#evaluation-on-labeled-data" target="_blank" rel="noopener">repo</a>.
+      Run <code>python evaluate.py</code> and you should get the same numbers.
+    </p>
+  </article>
+
+  <footer><div class="container">© 2026 Ryan Joshua George</div></footer>
+</body>
+</html>

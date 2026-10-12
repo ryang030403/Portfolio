@@ -1,0 +1,190 @@
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+\usepackage[T1]{fontenc}
+\usepackage{tgtermes}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.7in}
+\addtolength{\textheight}{1.4in}
+
+\urlstyle{same}
+
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% Custom Commands
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    #1 \vspace{-2pt}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small #3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & #2 \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.0in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+%-------------------------------------------
+%%%%%% RESUME STARTS HERE %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%----------HEADING----------
+
+\begin{center}
+    {\Huge \scshape Ryan Joshua George} \\ \vspace{6pt}
+    Bangalore, India \\ \vspace{4pt}
+    \small
+    \faEnvelope \hspace{2pt} \href{mailto:ryang0304@gmail.com}{ryang0304@gmail.com} ~
+    \faLinkedin \hspace{2pt}
+    \href{https://www.linkedin.com/in/ryan-joshua-georgee-13999a277}
+    {Ryan George} ~
+    \faGithub \hspace{2pt} \href{https://github.com/ryang030403}{github.com/ryang030403}
+\end{center}
+
+\vspace{-8pt}
+\begin{center}
+\small\textit{Full Stack Developer with hands-on experience building scalable web applications and APIs; skilled in React.js, Node.js, and distributed systems, with an academic foundation in machine learning and data science.}
+\end{center}
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+\resumeSubHeadingListStart
+
+\resumeSubheading
+{Grassroots}{Jan 2026 -- Present}
+{Full Stack Developer}{Bangalore, India}
+\resumeItemListStart
+    \resumeItem{Engineer and ship full-stack features end-to-end across a React.js/Node.js stack, supporting an active production user base}
+    \resumeItem{Design and build RESTful APIs powering business-critical workflows, working closely with the team to keep response times low}
+    \resumeItem{Partner with product, design, and QA teams in an Agile workflow to ship multiple releases per sprint with zero critical post-release bugs}
+    \resumeItem{Own database schema design and integration, applying indexing and query optimization to improve query performance}
+    \resumeItem{Streamline deployment workflows using CI/CD pipelines, shortening release turnaround time and reducing manual deployment steps}
+\resumeItemListEnd
+
+\resumeSubheading
+{Enhancio}{Aug 2024 -- Jan 2025}
+{Front-End Developer Intern}{Bangalore, India}
+\resumeItemListStart
+    \resumeItem{Built and shipped responsive UI components in React.js and JavaScript used across multiple production pages, contributing to faster page load times}
+    \resumeItem{Partnered with senior developers and designers to redesign core UI/UX flows to improve usability and user engagement}
+    \resumeItem{Diagnosed and resolved cross-browser compatibility issues, ensuring consistent rendering across Chrome, Firefox, and Safari}
+    \resumeItem{Built and integrated reusable front-end components consumed across multiple internal projects, reducing duplicate code}
+\resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+%-----------PROJECTS-----------
+\section{Projects}
+\resumeSubHeadingListStart
+
+\resumeProjectHeading
+{\textbf{Real-Time Chat Server} $|$ \emph{Node.js, Socket.IO, Express, JWT}}{}
+\resumeItemListStart
+    \resumeItem{Built a real-time messaging server load-tested at 100 concurrent authenticated WebSocket connections: 1.9ms average and 3.3ms p95 broadcast latency (localhost)}
+    \resumeItem{Implemented JWT authentication on REST and the WebSocket handshake, AES-256-GCM encryption of stored messages, and live cross-room notifications}
+    \resumeItem{Built multi-device session handling, with smoke and load tests verifying 0 of 20,000 deliveries dropped under load}
+\resumeItemListEnd
+
+\resumeProjectHeading
+{\textbf{Resume Screening System} $|$ \emph{Python, NLP, Scikit-learn}}{}
+\resumeItemListStart
+    \resumeItem{Built a TF-IDF candidate-ranking engine with keyword-gap reports, configurable thresholds and top-K shortlisting, backed by a 6-test pytest suite}
+    \resumeItem{Built a held-out evaluation on 8,000 human-labeled resume/job pairs: 55.0\% shortlisting accuracy vs a 48.7\% baseline (ROC AUC 0.59), establishing a benchmark for embedding-based models}
+\resumeItemListEnd
+
+\resumeProjectHeading
+{\textbf{Microservices E-Commerce Platform} $|$ \emph{Node.js, Express, Docker, JWT}}{}
+\resumeItemListStart
+    \resumeItem{Designed a distributed microservices architecture with 4 independently deployable services (user, product, payment, order) plus an API gateway, each owning its own data}
+    \resumeItem{Built secure REST APIs with JWT authentication and Docker containerization for all five services, orchestrated via Docker Compose}
+    \resumeItem{Load-tested the checkout saga at 50 concurrent orders: \textasciitilde500 orders/sec, zero overselling, and compensating rollback verified across 25 concurrent declined payments}
+\resumeItemListEnd
+
+\resumeProjectHeading
+{\textbf{Advanced Chess Analytics Engine} $|$ \emph{Python, Data Structures \& Algorithms}}{}
+\resumeItemListStart
+    \resumeItem{Built a PGN analytics engine with python-chess: streaming parser, recursive move tree, and win/draw/loss breakdowns for 16 opening lines}
+    \resumeItem{Trained a logistic-regression win-probability model evaluated on 793 real Lichess games with a game-level split: 61.6\% held-out accuracy vs a 51\% baseline (77\% in endgames)}
+\resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+%-----------EDUCATION-----------
+\section{Education}
+\resumeSubHeadingListStart
+
+\resumeSubheading
+{Monash University}{Jan 2025 -- Dec 2025}
+{Master of Data Science: one year of coursework completed (degree not conferred)}{Melbourne, Australia}
+\resumeItemListStart
+    \resumeItem{Relevant Coursework: Machine Learning, Artificial Intelligence, Statistical Modeling, Data Analytics}
+\resumeItemListEnd
+
+\resumeSubheading
+{Dayananda Sagar University}{2021 -- 2024}
+{Bachelor of Computer Applications}{Bangalore, India}
+\resumeItemListStart
+    \resumeItem{Relevant Coursework: Data Structures, Algorithms, Databases, Computer Networks, Web Technologies}
+\resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+%-----------SKILLS-----------
+\section{Technical Skills}
+
+\begin{itemize}[leftmargin=0.15in, label={}]
+\small{\item{
+\textbf{Languages}: JavaScript, TypeScript, Python, SQL, HTML/CSS \\
+
+\textbf{Frameworks \& Libraries}: React.js, Node.js, Express.js, REST APIs, WebSockets \\
+
+\textbf{Databases}: MongoDB, MySQL, Oracle SQL, Redis \\
+
+\textbf{Tools \& Platforms}: Git, GitHub, Docker, Postman, VS Code, Linux, Firebase, CI/CD \\
+
+\textbf{Core Concepts}: Data Structures \& Algorithms, OOP, System Design, Microservices Architecture, Database Design, Machine Learning, NLP
+}}
+\end{itemize}
+
+\end{document}

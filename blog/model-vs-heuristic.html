@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My trained model lost to a one-line heuristic | Ryan George</title>
+  <meta name="description" content="Baselines, game-level splits, and what 61.6% accuracy on real chess games actually means.">
+  <meta property="og:title" content="My trained model lost to a one-line heuristic">
+  <meta property="og:description" content="Baselines, game-level splits, and what 61.6% accuracy on real chess games actually means.">
+  <meta property="og:image" content="https://ryang030403.github.io/Portfolio/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="container">
+      <a class="brand" href="../index.html">ryan<span>.</span>george</a>
+      <ul>
+        <li><a href="../index.html#projects">Projects</a></li>
+        <li><a href="../index.html#blog">Blog</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <article class="post">
+    <a class="back" href="../index.html#blog">← All posts</a>
+    <h1>My trained model lost to a one-line heuristic</h1>
+    <div class="meta">Ryan Joshua George · October 2026 · 5 min read</div>
+
+    <p>
+      My chess analytics engine has a logistic-regression model that predicts whether White wins from a board position.
+      I evaluated it on 793 real blitz games from Lichess, and it reached <strong>61.6%</strong> held-out accuracy.
+      Is that good? The honest answer depends entirely on what you compare it to, and in my case the comparison
+      wasn't flattering.
+    </p>
+
+    <h2>A number without a baseline is noise</h2>
+    <p>Before trusting any accuracy figure, I now report it next to at least two baselines:</p>
+    <ol>
+      <li>The majority-class predictor (always guess the more common outcome).</li>
+      <li>The simplest domain heuristic a human would try first.</li>
+    </ol>
+    <p>For chess, the obvious heuristic is "whoever has more material is winning". Here's how the three compared:</p>
+    <pre><code>Held-out accuracy (mean over 5 game-level splits):
+  Trained logistic regression :  61.6%
+  Material heuristic baseline :  61.9%
+  Majority-class baseline     :  51.0%</code></pre>
+    <p>
+      The model beats the naive baseline by about ten points, which sounds good until you see the third row. A
+      formula with no training at all does just as well. With only three features (material balance, move number
+      and side to move), the model has mostly learned to say "more material wins", which is something I could have
+      written by hand in one line.
+    </p>
+
+    <h2>Held-out means held out</h2>
+    <p>
+      The quickest way to fool yourself is leakage. With chess positions it's easy to do by accident: every position
+      from the <em>same game</em> shares one outcome, so if some land in training and others in test, the model can
+      effectively memorise the game rather than learn anything about positions.
+    </p>
+    <pre><code># Split by GAME, not by position, so no game appears on both sides.
+rng.shuffle(decisive_games)
+cut = int(len(decisive_games) * 0.8)
+train_games, test_games = decisive_games[:cut], decisive_games[cut:]</code></pre>
+    <p>
+      I also average over five random splits, because with 154 held-out games a single split swings by several
+      points (from 56.9% to 63.6% across my runs). Reporting only the best split would have been easy and misleading.
+    </p>
+
+    <h2>Accuracy hides the interesting part</h2>
+    <p>Breaking accuracy down by game phase tells a much clearer story than the headline number:</p>
+    <pre><code>opening (ply 1-20)     49.6%
+middlegame (21-60)     64.6%
+endgame (61+)          77.2%</code></pre>
+    <p>
+      In the opening, material is almost always equal, so the model is guessing. Late in the game, material
+      differences are large and decisive. The "61.6%" averages a coin flip with something genuinely useful. If I
+      were shipping this, the per-phase numbers are the ones I'd put in front of users.
+    </p>
+
+    <h2>What I'd do next</h2>
+    <p>
+      The model isn't the problem; the features are. Mobility, king safety, passed pawns, or simply an engine's
+      centipawn evaluation would give it something the material heuristic doesn't already know. The point of
+      building the evaluation first is that I'll find out immediately whether those features actually help.
+    </p>
+
+    <h2>Why this matters beyond chess</h2>
+    <p>
+      The same discipline applies to every AI feature people ship today, LLM-powered ones included. "Our classifier
+      is 90% accurate" means nothing until you know the baseline, how the test set was built, and where the errors
+      are. Ask those three questions every time. It's cheap, and it would have stopped me claiming my model was
+      better than it is. The evaluation script and data are in the
+      <a href="https://github.com/ryang030403/Chess_Analytics#evaluation-on-real-games" target="_blank" rel="noopener">repo</a>.
+    </p>
+  </article>
+
+  <footer><div class="container">© 2026 Ryan Joshua George</div></footer>
+</body>
+</html>
