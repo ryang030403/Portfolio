@@ -150,3 +150,8 @@ footer { border-top: 1px solid var(--border); padding: 28px 0; color: var(--mute
   .about-grid { grid-template-columns: 1fr; }
   .hero { padding: 64px 0 48px; }
 }
+
+.block { display: block; }
+
+.links { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); }
+.links a { font-family: var(--mono); font-size: 0.85rem; }
